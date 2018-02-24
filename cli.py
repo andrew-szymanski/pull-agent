@@ -13,6 +13,15 @@ import imp
 import traceback
 
 
+LOG_INDENT = "  "
+logger = logging.getLogger("datameer-rest-client")
+console = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s',"%Y-%m-%d %H:%M:%S")
+console.setFormatter(formatter)
+logger.addHandler(console)
+logger.setLevel(logging.DEBUG)     # default, this will be reset later
+
+
 def main(argv=None):
     from optparse import OptionParser, OptionGroup
     logger.debug("main starting...")
