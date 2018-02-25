@@ -26,7 +26,7 @@ console = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s',"%Y-%m-%d %H:%M:%S")
 console.setFormatter(formatter)
 logger.addHandler(console)
-logger.setLevel(logging.DEBUG)     # default, this will be reset later
+logger.setLevel(logging.INFO)     # default, this will be reset later
 
 
 
@@ -83,7 +83,18 @@ class Poller(object):
         except Exception:
             self.logger.warn("SLEEP_TIME [%s] invalid number, applying default" % poller_settings.SLEEP_TIME)
             self.sleep_time=3
-        self.logger.info("sleep time: [%s]" % self.sleep_time)
+        self.logger.info("sleep_time: [%s]" % self.sleep_time)
+
+        # validate max workers
+        try:
+            self.max_workers=int(poller_settings.MAX_WORKERS)
+        except Exception:
+            self.logger.warn("MAX_WORKERS [%s] invalid number, applying default" % poller_settings.MAX_WORKERS)
+            self.max_workers=3
+        self.logger.info("max_workers: [%s]" % self.max_workers)        
+
+
+        # and finally enter poll loop
         self.poll()
 
     def stop(self, *args, **kwargs):
