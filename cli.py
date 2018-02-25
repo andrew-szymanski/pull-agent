@@ -14,6 +14,7 @@ import traceback
 import fcntl
 import time
 from numbers import Number
+import glob
 
 # app
 import poller_settings
@@ -124,6 +125,12 @@ class Poller(object):
                 exit(0)
 
 
+            # poll default dir
+            filelist = glob.glob("%s/*" % self.poll_dir)
+            for filename in filelist:
+                self.logger.info("   file: [%s]" % filename)
+
+
             time.sleep(self.sleep_time)
             self.logger.debug("going to sleep for [%s] seconds" % self.sleep_time)
 
@@ -144,7 +151,7 @@ def run_poller_command(command, args):
         return;
 
     if ( command == 'stop' ):
-        logger.debug("stopping polller...")
+        logger.info("issuing stop command...")
         poller = Poller(logger=logger)
         poller.stop(args)
         return;        

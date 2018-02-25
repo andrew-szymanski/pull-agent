@@ -16,4 +16,10 @@ except IOError:
 
 ## poller commands
 * poller.stop
-* poller.sleep_time
+* poller.run
+
+
+# links
+
+https://pymotw.com/3/multiprocessing/basics.html#determining-the-current-process
+
