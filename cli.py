@@ -14,7 +14,7 @@ import traceback
 
 
 LOG_INDENT = "  "
-logger = logging.getLogger("adsafds")
+logger = logging.getLogger("polling-deployer")
 console = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s',"%Y-%m-%d %H:%M:%S")
 console.setFormatter(formatter)
@@ -22,6 +22,18 @@ logger.addHandler(console)
 logger.setLevel(logging.DEBUG)     # default, this will be reset later
 
 
+
+def main_run(opts, args):
+    logger.info("%s starting..." % inspect.stack()[0][3])
+    print ("opts: [%s]" % opts)
+    print ("args: [%s]" % args)
+
+    command = opts.command
+    print ("command: [%s]" % command)
+    pass
+
+
+# commands:
 def main(argv=None):
     from optparse import OptionParser, OptionGroup
     logger.debug("main starting...")
@@ -33,6 +45,7 @@ def main(argv=None):
     # cat options
     cat_options = OptionGroup(parser, "options")
     cat_options.add_option("-d", "--debug", help="debug logging, specify any value to enable debug, omit this param to disable, example: --debug=False", default=False)
+    cat_options.add_option("-c", "--command", help="command, see README.md, example: --command=poller.stop", default=False)
     parser.add_option_group(cat_options)
 
     try: 
@@ -40,7 +53,7 @@ def main(argv=None):
     except Exception as e:
         sys.exit("ERROR: [%s]" % e)
 
-    #mainRun(opts, parser)
+    main_run(opts, args)
 
 
 if __name__ == "__main__":
