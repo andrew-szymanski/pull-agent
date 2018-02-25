@@ -127,6 +127,12 @@ class Poller(object):
                 os.remove(poller_settings.STOP_FILE_FULLPATH)
                 exit(0)
 
+            # remove all finished jobs
+            for p in jobs:
+                if not p.is_alive():
+                    self.logger.debug("[%s] finished" % p.name)
+                    jobs.remove(p)
+
             # check how many working workers we have
             current_jobs = len(jobs)
             self.logger.debug("current_jobs: [%s]" % current_jobs)
@@ -134,20 +140,20 @@ class Poller(object):
             # poll default dir - one file at a time
             filelist = glob.glob("%s/*" % self.poll_dir)
             if ( len(filelist) > 0 ):
-                filename = filelist[0]
+                file_fullpath = filelist[0]
+                file_name = os.path.basename(file_fullpath)
                 if ( current_jobs < self.max_workers ):
-                    self.logger.debug("starting worker for: [%s]" % filename)
+                    self.logger.debug("starting worker for: [%s]" % file_name)
                     current_jobs = current_jobs + 1
                     p = multiprocessing.Process(
-                        name="worker-%s" % current_jobs,
+                        name="worker: %s" % file_name,
                         target=poller_worker.worker,
-                        args=(self.logger, filename)
+                        args=(self.logger, file_fullpath)
                     )
                     jobs.append(p)
                     p.start()   
                 else:
-                    self.logger.warn("maximum workers [%s] reached, file [%s] will be proccessed later" % (self.max_workers, filename) )
-
+                    self.logger.warn("maximum workers [%s] reached, file [%s] will be proccessed later" % (self.max_workers, file_name) )
 
             time.sleep(self.sleep_time)
             self.logger.debug("going to sleep for [%s] seconds" % self.sleep_time)
