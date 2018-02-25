@@ -74,9 +74,14 @@ class Poller(object):
 
         # check if poll dir exists and create if it does not
         if not os.path.exists(self.poll_dir ):
-            os.makedirs(self.poll_dir)        
+            os.makedirs(self.poll_dir) 
 
-
+        # validate sleep time
+        self.sleep_time=poller_settings.SLEEP_TIME
+        if not self.sleep_time.isdigit():
+            self.logger.warn("SLEEP_TIME [%s] invalid number, applying default" % poller_settings.SLEEP_TIME)
+            self.sleep_time=3
+        self.logger.info("sleep time: [%s]" % self.sleep_time
         self.poll()
 
     def stop(self, *args, **kwargs):
@@ -99,14 +104,18 @@ class Poller(object):
         """
         self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
         while True:
-            time.sleep(2)
-            self.logger.debug("going to sleep...")
-
             # check if stop file exists
             if os.path.exists(poller_settings.STOP_FILE_FULLPATH):
                 self.logger.info("request to stop received...")
                 os.remove(poller_settings.STOP_FILE_FULLPATH)
                 exit(0)
+
+
+            time.sleep(self.sleep_time)
+            self.logger.debug("going to sleep for [%s] seconds" % self.sleep_time)
+
+
+
 
 
 
