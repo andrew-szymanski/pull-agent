@@ -135,9 +135,9 @@ class Poller(object):
             filelist = glob.glob("%s/*" % self.poll_dir)
             if ( len(filelist) > 0 ):
                 filename = filelist[0]
-                self.logger.debug("starting worker for: [%s]" % filename)
-                current_jobs = current_jobs + 1
                 if ( current_jobs < self.max_workers ):
+                    self.logger.debug("starting worker for: [%s]" % filename)
+                    current_jobs = current_jobs + 1
                     p = multiprocessing.Process(
                         name="worker-%s" % current_jobs,
                         target=poller_worker.worker,
