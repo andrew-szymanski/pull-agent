@@ -43,6 +43,11 @@ class Poller(object):
         # initial log entry
         self.logger.setLevel(logger.getEffectiveLevel())
         self.logger.debug("%s: %s version [%s]" % (self.__class__.__name__, inspect.getfile(inspect.currentframe()),__version__))
+
+        # default poll directory
+        app_path = os.path.dirname(os.path.realpath(__file__))
+        self.logger.debug("app_path: [%s]" % app_path)
+        self.poll_dir = "%s/%s" % (app_path, poller_settings.DEFAULT_POLL_DIR)
       
 
     def run(self, *args, **kwargs):
@@ -66,6 +71,12 @@ class Poller(object):
         if os.path.exists(poller_settings.STOP_FILE_FULLPATH):
             self.logger.info("stop file exists on start - removing it")
             os.remove(poller_settings.STOP_FILE_FULLPATH)
+
+        # check if poll dir exists and create if it does not
+        if not os.path.exists(self.poll_dir ):
+            os.makedirs(self.poll_dir)        
+
+
         self.poll()
 
     def stop(self, *args, **kwargs):
