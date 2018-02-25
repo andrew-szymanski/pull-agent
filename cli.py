@@ -28,7 +28,7 @@ def main_run(opts, args):
     print ("opts: [%s]" % opts)
     print ("args: [%s]" % args)
 
-    command = opts.command
+    (component, command) = opts.command.split(".")
     print ("command: [%s]" % command)
     pass
 
