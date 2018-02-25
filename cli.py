@@ -11,8 +11,10 @@ import os
 import inspect
 import imp
 import traceback
+import fcntl
 
 
+# globals
 LOG_INDENT = "  "
 logger = logging.getLogger("polling-deployer")
 console = logging.StreamHandler()
@@ -21,28 +23,40 @@ console.setFormatter(formatter)
 logger.addHandler(console)
 logger.setLevel(logging.DEBUG)     # default, this will be reset later
 
+LOCK_FILE_FULLPATH="/tmp/polling-deployer.lck"
+
 
 
 class Poller(object):
-   """ Class for polling functionality
-   """
-   def __init__(self, **kwargs):
-      """Create an object and attach or initialize logger
-      """
-      self.logger = kwargs.get('logger',None)
-      if ( self.logger is None ):
+    """ Class for polling functionality
+    """
+    def __init__(self, **kwargs):
+        """Create an object and attach or initialize logger
+        """
+        self.logger = kwargs.get('logger',None)
+        if ( self.logger is None ):
             # Get an instance of a logger
             self.logger = logger
-      # initial log entry
-      self.logger.setLevel(logger.getEffectiveLevel())
-      self.logger.debug("%s: %s version [%s]" % (self.__class__.__name__, inspect.getfile(inspect.currentframe()),__version__))
+        # initial log entry
+        self.logger.setLevel(logger.getEffectiveLevel())
+        self.logger.debug("%s: %s version [%s]" % (self.__class__.__name__, inspect.getfile(inspect.currentframe()),__version__))
       
 
-   def run(self, *args, **kwargs):
-      """ run singleton logger
-      """
-      self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
-      self.logger.debug("args: [%s]" % args)
+    def run(self, *args, **kwargs):
+        """ run singleton logger
+        """
+        self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
+        self.logger.debug("args: [%s]" % args)
+        self.logger.debug("lockflie: [%s]" % LOCK_FILE_FULLPATH)
+        #
+        lock_file = LOCK_FILE_FULLPATH
+        fp = open(lock_file, 'w')
+        try:
+            fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except IOError:
+            # another instance is running
+            self.logger.warn("another instance already running - exiting")
+            sys.exit(0)
       
 
 
@@ -56,7 +70,7 @@ def run_poller_command(command, args):
 
     # switch
     if ( command == 'run' ):
-        logger.debug("creating poller object...") 
+        logger.debug("starting polller...")
         poller = Poller(logger=logger)
         poller.run(args)
         #logger.debug("setting up Helper_Manager...") 
