@@ -14,6 +14,9 @@ import traceback
 import fcntl
 import time
 
+# app
+import poller_settings
+
 
 # globals
 LOG_INDENT = "  "
@@ -24,8 +27,6 @@ console.setFormatter(formatter)
 logger.addHandler(console)
 logger.setLevel(logging.DEBUG)     # default, this will be reset later
 
-LOCK_FILE_FULLPATH="/tmp/polling-deployer.lck"
-STOP_FILE_FULLPATH="/tmp/polling-deployer.stop"
 
 
 
@@ -49,9 +50,9 @@ class Poller(object):
         """
         self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
         self.logger.debug("args: [%s]" % args)
-        self.logger.debug("lockfile: [%s]" % LOCK_FILE_FULLPATH)
+        self.logger.debug("lockfile: [%s]" % poller_settings.LOCK_FILE_FULLPATH)
         #
-        lock_file = LOCK_FILE_FULLPATH
+        lock_file = poller_settings.LOCK_FILE_FULLPATH
         fp = open(lock_file, 'w')
         try:
             fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -62,18 +63,18 @@ class Poller(object):
       
         self.logger.info("poller starting...")
         # check if stop file exists and make sure it doesn't
-        if os.path.exists(STOP_FILE_FULLPATH):
+        if os.path.exists(poller_settings.STOP_FILE_FULLPATH):
             self.logger.info("stop file exists on start - removing it")
-            os.remove(STOP_FILE_FULLPATH)
+            os.remove(poller_settings.STOP_FILE_FULLPATH)
         self.poll()
 
     def stop(self, *args, **kwargs):
         """ stop singleton logger
         """
         self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
-        self.logger.debug("stopfile: [%s]" % STOP_FILE_FULLPATH)
+        self.logger.debug("stopfile: [%s]" % poller_settings.STOP_FILE_FULLPATH)
         #
-        stop_file = STOP_FILE_FULLPATH
+        stop_file = poller_settings.STOP_FILE_FULLPATH
         fp = open(stop_file, 'w')
         try:
             fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -91,9 +92,9 @@ class Poller(object):
             self.logger.debug("going to sleep...")
 
             # check if stop file exists
-            if os.path.exists(STOP_FILE_FULLPATH):
+            if os.path.exists(poller_settings.STOP_FILE_FULLPATH):
                 self.logger.info("request to stop received...")
-                os.remove(STOP_FILE_FULLPATH)
+                os.remove(poller_settings.STOP_FILE_FULLPATH)
                 exit(0)
 
 
