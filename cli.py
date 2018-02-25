@@ -163,6 +163,8 @@ def run_poller_command(command, args):
 
 def run_main(opts, args):
     logger.info("%s starting..." % inspect.stack()[0][3])
+    if ( opts.debug ):
+        logger.setLevel(logging.DEBUG)     # default, this will be reset later
 
     (component, command) = opts.command.split(".")
     if ( component == 'poller' ):
