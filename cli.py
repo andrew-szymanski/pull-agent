@@ -15,9 +15,11 @@ import fcntl
 import time
 from numbers import Number
 import glob
+import multiprocessing
 
 # app
 import poller_settings
+import poller_worker
 
 
 # globals
@@ -117,6 +119,7 @@ class Poller(object):
         """ main polling loop
         """
         self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
+        jobs = []
         while True:
             # check if stop file exists
             if os.path.exists(poller_settings.STOP_FILE_FULLPATH):
@@ -124,11 +127,26 @@ class Poller(object):
                 os.remove(poller_settings.STOP_FILE_FULLPATH)
                 exit(0)
 
+            # check how many working workers we have
+            current_jobs = len(jobs)
+            self.logger.debug("current_jobs: [%s]" % current_jobs)
 
-            # poll default dir
+            # poll default dir - one file at a time
             filelist = glob.glob("%s/*" % self.poll_dir)
-            for filename in filelist:
-                self.logger.info("   file: [%s]" % filename)
+            if ( len(filelist) > 0 ):
+                filename = filelist[0]
+                self.logger.debug("starting worker for: [%s]" % filename)
+                current_jobs = current_jobs + 1
+                if ( current_jobs < self.max_workers ):
+                    p = multiprocessing.Process(
+                        name="worker-%s" % current_jobs,
+                        target=poller_worker.worker,
+                        args=(self.logger, filename)
+                    )
+                    jobs.append(p)
+                    p.start()   
+                else:
+                    self.logger.warn("maximum workers [%s] reached, file [%s] will be proccessed later" % (self.max_workers, filename) )
 
 
             time.sleep(self.sleep_time)
@@ -203,7 +221,8 @@ def main(argv=None):
 
 if __name__ == "__main__":
     logger.info("__main__ starting...")
-    try:
-        main()
-    except Exception as e:
-        sys.exit("ERROR: [%s]" % e)    
+    main()
+    # try:
+    #     main()
+    # except Exception as e:
+    #     sys.exit("ERROR: [%s]" % e)    
