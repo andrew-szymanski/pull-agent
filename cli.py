@@ -58,7 +58,7 @@ class Poller(object):
             self.logger.warn("another instance already running - exiting")
             sys.exit(0)
       
-
+        self.logger.info("poller starting...")
 
 
 
