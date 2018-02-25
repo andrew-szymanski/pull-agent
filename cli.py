@@ -14,7 +14,7 @@ import traceback
 
 
 LOG_INDENT = "  "
-logger = logging.getLogger("datameer-rest-client")
+logger = logging.getLogger("adsafds")
 console = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s',"%Y-%m-%d %H:%M:%S")
 console.setFormatter(formatter)
