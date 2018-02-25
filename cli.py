@@ -22,15 +22,16 @@ logger.addHandler(console)
 logger.setLevel(logging.DEBUG)     # default, this will be reset later
 
 
-
-def main_run(opts, args):
+def run_poller_command(command, args):
     logger.info("%s starting..." % inspect.stack()[0][3])
-    print ("opts: [%s]" % opts)
-    print ("args: [%s]" % args)
+    logger.debug("command: [%s], args: [%s]" % (command, args))
+ 
+def run_main(opts, args):
+    logger.info("%s starting..." % inspect.stack()[0][3])
 
     (component, command) = opts.command.split(".")
-    print ("command: [%s]" % command)
-    pass
+    if ( component == 'poller' ):
+        run_poller_command(command, args)
 
 
 # commands:
@@ -53,7 +54,7 @@ def main(argv=None):
     except Exception as e:
         sys.exit("ERROR: [%s]" % e)
 
-    main_run(opts, args)
+    run_main(opts, args)
 
 
 if __name__ == "__main__":
