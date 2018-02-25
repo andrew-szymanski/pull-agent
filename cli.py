@@ -130,7 +130,7 @@ class Poller(object):
             # remove all finished jobs
             for p in jobs:
                 if not p.is_alive():
-                    self.logger.debug("[%s] finished" % p.name)
+                    self.logger.info("[%s] finished" % p.name)
                     jobs.remove(p)
 
             # check how many working workers we have
@@ -143,7 +143,7 @@ class Poller(object):
                 file_fullpath = filelist[0]
                 file_name = os.path.basename(file_fullpath)
                 if ( current_jobs < self.max_workers ):
-                    self.logger.debug("starting worker for: [%s]" % file_name)
+                    self.logger.info("starting worker for: [%s]" % file_name)
                     current_jobs = current_jobs + 1
                     p = multiprocessing.Process(
                         name="worker: %s" % file_name,
