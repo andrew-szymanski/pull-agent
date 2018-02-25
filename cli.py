@@ -13,6 +13,7 @@ import imp
 import traceback
 import fcntl
 import time
+from numbers import Number
 
 # app
 import poller_settings
@@ -77,11 +78,12 @@ class Poller(object):
             os.makedirs(self.poll_dir) 
 
         # validate sleep time
-        self.sleep_time=poller_settings.SLEEP_TIME
-        if not self.sleep_time.isdigit():
+        try:
+            self.sleep_time=int(poller_settings.SLEEP_TIME)
+        except Exception:
             self.logger.warn("SLEEP_TIME [%s] invalid number, applying default" % poller_settings.SLEEP_TIME)
             self.sleep_time=3
-        self.logger.info("sleep time: [%s]" % self.sleep_time
+        self.logger.info("sleep time: [%s]" % self.sleep_time)
         self.poll()
 
     def stop(self, *args, **kwargs):
