@@ -12,6 +12,7 @@ import inspect
 import imp
 import traceback
 import fcntl
+import time
 
 
 # globals
@@ -43,7 +44,7 @@ class Poller(object):
       
 
     def run(self, *args, **kwargs):
-        """ run singleton logger
+        """ start singleton logger
         """
         self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
         self.logger.debug("args: [%s]" % args)
@@ -59,8 +60,17 @@ class Poller(object):
             sys.exit(0)
       
         self.logger.info("poller starting...")
+        self.poll()
 
 
+
+    def poll(self):
+        """ main polling loop
+        """
+        self.logger.debug("%s::%s starting..." %  (self.__class__.__name__ , inspect.stack()[0][3])) 
+        while True:
+            time.sleep(2)
+            self.logger.debug("going to sleep...")
 
 
 
